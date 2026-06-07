@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AdminWorkerActions } from "@/components/features/admin-worker-actions";
 import { Badge } from "@/components/ui/badge";
-import { cldUrl } from "@/lib/cloudinary";
 import { formatRate } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -58,7 +57,7 @@ export default async function AdminWorkerDetail({
                   <div key={p.id} className="relative">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={cldUrl(p.cloudinary_public_id, { width: 300, height: 300, crop: "fill" })}
+                      src={p.url}
                       alt={p.caption ?? "photo"}
                       className="h-28 w-full rounded-lg object-cover"
                       loading="lazy"

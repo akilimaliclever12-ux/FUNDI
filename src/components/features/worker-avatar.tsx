@@ -1,24 +1,23 @@
-import { cldUrl } from "@/lib/cloudinary";
 import { initials } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 
 /** Optimized avatar/cover image with initials fallback. Plain <img> for tiny payload. */
 export function WorkerImage({
-  publicId,
+  url,
   name,
   width = 480,
   height = 320,
   className,
   rounded = false,
 }: {
-  publicId?: string | null;
+  url?: string | null;
   name: string;
   width?: number;
   height?: number;
   className?: string;
   rounded?: boolean;
 }) {
-  if (!publicId) {
+  if (!url) {
     return (
       <div
         className={cn(
@@ -36,7 +35,7 @@ export function WorkerImage({
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src={cldUrl(publicId, { width, height, crop: "fill" })}
+      src={url}
       alt={name}
       width={width}
       height={height}

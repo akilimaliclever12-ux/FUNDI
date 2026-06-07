@@ -66,7 +66,7 @@ export interface WorkerRow {
 export interface WorkerPhotoRow {
   id: string;
   worker_id: string;
-  cloudinary_public_id: string;
+  storage_path: string; // object key in the Supabase Storage "worker-photos" bucket
   url: string;
   type: PhotoType;
   caption: string | null;

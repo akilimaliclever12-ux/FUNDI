@@ -75,7 +75,7 @@ export async function createWorkerProfile(input: {
       const d = (r as { data: ReturnType<typeof workerPhotoMetaSchema.parse> }).data;
       return {
         worker_id: worker.id,
-        cloudinary_public_id: d.cloudinary_public_id,
+        storage_path: d.storage_path,
         url: d.url,
         type: d.type,
         width: d.width ?? null,

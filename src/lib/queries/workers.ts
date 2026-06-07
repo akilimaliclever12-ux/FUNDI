@@ -6,7 +6,7 @@ const WORKER_SELECT = `
   *,
   profession:professions ( id, slug, name_fr, name_sw, icon ),
   location:locations ( id, slug, name, type ),
-  photos:worker_photos ( id, url, cloudinary_public_id, type, is_primary, sort_order, width, height )
+  photos:worker_photos ( id, url, storage_path, type, is_primary, sort_order, width, height )
 `;
 
 export interface WorkerListResult {

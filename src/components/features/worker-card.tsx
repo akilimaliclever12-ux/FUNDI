@@ -15,7 +15,7 @@ export function WorkerCard({ worker }: { worker: WorkerWithRelations }) {
     <Link href={`/workers/${worker.id}`} className="card group block overflow-hidden">
       <div className="relative h-40 w-full overflow-hidden">
         <WorkerImage
-          publicId={primary?.cloudinary_public_id}
+          url={primary?.url}
           name={worker.headline}
           width={480}
           height={320}

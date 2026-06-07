@@ -19,7 +19,7 @@ export const workerProfileSchema = z.object({
 export type WorkerProfileInput = z.infer<typeof workerProfileSchema>;
 
 export const workerPhotoMetaSchema = z.object({
-  cloudinary_public_id: z.string().min(1),
+  storage_path: z.string().min(1),
   url: z.string().url(),
   type: z.enum(["portfolio", "avatar", "verification"]).default("portfolio"),
   width: z.number().int().optional(),

@@ -6,7 +6,6 @@ import { WhatsAppButton } from "@/components/features/whatsapp-button";
 import { ReviewForm } from "@/components/features/review-form";
 import { Rating } from "@/components/ui/rating";
 import { Badge } from "@/components/ui/badge";
-import { cldUrl } from "@/lib/cloudinary";
 import { formatRate } from "@/lib/utils";
 import { defaultContactMessage } from "@/lib/whatsapp";
 
@@ -47,7 +46,7 @@ export default async function WorkerProfilePage({
         <div className="space-y-6 lg:col-span-2">
           <div className="card overflow-hidden">
             <WorkerImage
-              publicId={cover?.cloudinary_public_id}
+              url={cover?.url}
               name={worker.headline}
               width={900}
               height={500}
@@ -92,7 +91,7 @@ export default async function WorkerProfilePage({
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     key={p.id}
-                    src={cldUrl(p.cloudinary_public_id, { width: 400, height: 400, crop: "fill" })}
+                    src={p.url}
                     alt={p.caption ?? worker.headline}
                     width={400}
                     height={400}

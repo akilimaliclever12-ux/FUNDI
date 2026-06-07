@@ -2,9 +2,9 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    // Cloudinary delivers optimized images; allow its host for next/image where used.
+    // Worker photos are served from Supabase Storage public URLs.
     remotePatterns: [
-      { protocol: "https", hostname: "res.cloudinary.com" },
+      { protocol: "https", hostname: "*.supabase.co" },
     ],
   },
   async headers() {

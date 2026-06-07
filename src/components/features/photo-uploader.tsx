@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+import { PHOTOS_BUCKET } from "@/lib/storage";
 
 export interface UploadedPhoto {
-  cloudinary_public_id: string;
+  storage_path: string;
   url: string;
   width?: number;
   height?: number;
@@ -11,10 +13,35 @@ export interface UploadedPhoto {
 
 const MAX_FILES = 6;
 const MAX_BYTES = 5 * 1024 * 1024; // 5MB
+const MAX_DIM = 1280; // downscale longest side — low-bandwidth friendly
+const JPEG_QUALITY = 0.75;
+
+/** Resize/compress an image File in the browser before upload. */
+async function compressImage(
+  file: File,
+): Promise<{ blob: Blob; width: number; height: number }> {
+  const bitmap = await createImageBitmap(file);
+  let { width, height } = bitmap;
+  if (width > MAX_DIM || height > MAX_DIM) {
+    const scale = MAX_DIM / Math.max(width, height);
+    width = Math.round(width * scale);
+    height = Math.round(height * scale);
+  }
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return { blob: file, width, height };
+  ctx.drawImage(bitmap, 0, 0, width, height);
+  const blob: Blob = await new Promise((resolve) =>
+    canvas.toBlob((b) => resolve(b ?? file), "image/jpeg", JPEG_QUALITY),
+  );
+  return { blob, width, height };
+}
 
 /**
- * Signed direct-to-Cloudinary upload. Asks our server to sign, then uploads
- * straight to Cloudinary so large files never pass through our server.
+ * Upload flow: compress -> ask our server for a signed Supabase upload URL ->
+ * upload directly to Supabase Storage -> keep the public URL.
  */
 export function PhotoUploader({
   value,
@@ -23,6 +50,7 @@ export function PhotoUploader({
   value: UploadedPhoto[];
   onChange: (photos: UploadedPhoto[]) => void;
 }) {
+  const supabase = createClient();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -38,36 +66,33 @@ export function PhotoUploader({
     setBusy(true);
     try {
       const uploaded: UploadedPhoto[] = [];
+      let i = 0;
       for (const file of Array.from(files)) {
         if (file.size > MAX_BYTES) {
           setError("Chaque photo doit faire moins de 5 Mo.");
           continue;
         }
-        // 1) get a signature from our server
-        const signRes = await fetch("/api/upload/sign", { method: "POST" });
-        if (!signRes.ok) throw new Error("sign failed");
-        const { signature, timestamp, apiKey, cloudName, folder } = await signRes.json();
 
-        // 2) upload directly to Cloudinary
-        const form = new FormData();
-        form.append("file", file);
-        form.append("api_key", apiKey);
-        form.append("timestamp", String(timestamp));
-        form.append("signature", signature);
-        form.append("folder", folder);
+        // 1) compress in-browser
+        const { blob, width, height } = await compressImage(file);
 
-        const up = await fetch(
-          `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
-          { method: "POST", body: form },
-        );
-        if (!up.ok) throw new Error("upload failed");
-        const data = await up.json();
-        uploaded.push({
-          cloudinary_public_id: data.public_id,
-          url: data.secure_url,
-          width: data.width,
-          height: data.height,
+        // 2) get a signed upload URL from our server
+        const signRes = await fetch("/api/upload/sign", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ext: "jpg", index: value.length + i }),
         });
+        if (!signRes.ok) throw new Error("sign failed");
+        const { path, token, publicUrl } = await signRes.json();
+
+        // 3) upload directly to Supabase Storage via the signed token
+        const { error: upErr } = await supabase.storage
+          .from(PHOTOS_BUCKET)
+          .uploadToSignedUrl(path, token, blob, { contentType: "image/jpeg" });
+        if (upErr) throw upErr;
+
+        uploaded.push({ storage_path: path, url: publicUrl, width, height });
+        i++;
       }
       onChange([...value, ...uploaded]);
     } catch {
@@ -85,7 +110,7 @@ export function PhotoUploader({
     <div className="space-y-3">
       <div className="grid grid-cols-3 gap-2">
         {value.map((p, i) => (
-          <div key={p.cloudinary_public_id} className="relative">
+          <div key={p.storage_path} className="relative">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={p.url}
@@ -119,7 +144,9 @@ export function PhotoUploader({
         </label>
       )}
       {error && <p className="text-sm text-danger">{error}</p>}
-      <p className="text-xs text-gray-400">JPG/PNG, max {MAX_FILES} photos, 5 Mo chacune.</p>
+      <p className="text-xs text-gray-400">
+        JPG/PNG, max {MAX_FILES} photos. Les images sont compressées automatiquement.
+      </p>
     </div>
   );
 }
