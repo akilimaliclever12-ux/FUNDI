@@ -1,0 +1,13 @@
+# Minimal Supabase CLI config. Run: supabase start (local) / supabase db push (remote)
+project_id = "fundi-bukavu"
+
+[db]
+port = 54322
+major_version = 15
+
+[auth]
+enable_signup = true
+# Phone auth (workers). Configure an SMS provider in the Supabase dashboard.
+[auth.sms]
+enable_signup = true
+enable_confirmations = true
