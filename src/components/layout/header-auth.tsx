@@ -29,7 +29,14 @@ export function HeaderAuth() {
   }, []);
 
   if (signedIn) {
-    return <LogoutButton className="ml-1 px-3 py-2 text-xs sm:text-sm" />;
+    return (
+      <>
+        <Link href="/messages" className="rounded-lg px-3 py-2 hover:bg-gray-50 hover:text-ink">
+          Messages
+        </Link>
+        <LogoutButton className="ml-1 px-3 py-2 text-xs sm:text-sm" />
+      </>
+    );
   }
 
   // default (anonymous, or while resolving): show the primary CTA

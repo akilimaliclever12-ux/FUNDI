@@ -1,13 +1,12 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getWorkerById } from "@/lib/queries/workers";
 import { WorkerImage } from "@/components/features/worker-avatar";
-import { WhatsAppButton } from "@/components/features/whatsapp-button";
 import { ReviewForm } from "@/components/features/review-form";
 import { Rating } from "@/components/ui/rating";
 import { Badge } from "@/components/ui/badge";
 import { formatRate } from "@/lib/utils";
-import { defaultContactMessage } from "@/lib/whatsapp";
 
 export const revalidate = 600;
 
@@ -37,7 +36,6 @@ export default async function WorkerProfilePage({
   const gallery = photos.filter((p) => p.id !== cover?.id);
   const reviews = (worker.reviews ?? []).filter((r) => r.status === "published");
   const rate = formatRate(worker.hourly_rate_min, worker.hourly_rate_max);
-  const waMsg = defaultContactMessage(worker.headline, worker.profession?.name_fr);
 
   return (
     <div className="container-page py-6">
@@ -133,13 +131,11 @@ export default async function WorkerProfilePage({
         <aside className="lg:col-span-1">
           <div className="card space-y-3 p-5 lg:sticky lg:top-20">
             <p className="text-sm text-gray-600">Intéressé par ce fundi ?</p>
-            <WhatsAppButton
-              workerId={worker.id}
-              number={worker.whatsapp_number}
-              message={waMsg}
-            />
+            <Link href={`/messages/start?worker=${worker.id}`} className="btn-gradient w-full">
+              💬 Discuter avec ce fundi
+            </Link>
             <p className="text-center text-xs text-gray-400">
-              Vous serez redirigé vers WhatsApp pour discuter directement.
+              Discutez directement sur Fundi. Connexion par téléphone requise.
             </p>
           </div>
         </aside>

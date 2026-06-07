@@ -7,7 +7,7 @@ export type WorkerStatus = "pending" | "approved" | "rejected" | "suspended";
 export type LocationType = "city" | "commune" | "quartier";
 export type ReviewStatus = "pending" | "published" | "rejected";
 export type PhotoType = "portfolio" | "avatar" | "verification";
-export type LeadChannel = "whatsapp" | "call" | "form";
+export type LeadChannel = "whatsapp" | "call" | "form" | "chat";
 export type LeadStatus = "new" | "contacted" | "converted" | "lost";
 export type JobStatus = "open" | "assigned" | "closed" | "cancelled";
 export type AdminRole = "super_admin" | "moderator" | "support";
@@ -105,6 +105,27 @@ export interface LeadRow {
   status: LeadStatus;
   ip_hash: string | null;
   user_agent: string | null;
+  created_at: string;
+}
+
+export interface ConversationRow {
+  id: string;
+  worker_id: string;
+  customer_user_id: string;
+  last_message_at: string | null;
+  last_message_preview: string | null;
+  customer_unread: number;
+  worker_unread: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface MessageRow {
+  id: string;
+  conversation_id: string;
+  sender_user_id: string;
+  body: string;
+  read_at: string | null;
   created_at: string;
 }
 
