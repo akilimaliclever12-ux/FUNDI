@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SITE_NAME } from "@/lib/constants";
+import { HeaderAuth } from "./header-auth";
 
 export function Header() {
   return (
@@ -22,9 +23,7 @@ export function Header() {
           <Link href="/contact" className="hidden rounded-lg px-3 py-2 hover:bg-gray-50 hover:text-ink sm:block">
             Contact
           </Link>
-          <Link href="/rejoindre" className="btn-gradient ml-1 px-3 py-2 text-xs sm:text-sm">
-            Devenir fundi
-          </Link>
+          <HeaderAuth />
         </nav>
       </div>
     </header>
