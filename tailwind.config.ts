@@ -31,7 +31,16 @@ const config: Config = {
         "brand-gradient-vivid": "linear-gradient(135deg, #0B5FFF 0%, #3B82F6 100%)",
       },
       fontFamily: {
-        sans: ["var(--font-inter)", "system-ui", "sans-serif"],
+        // Native system stack — no web-font download (low-bandwidth friendly).
+        sans: [
+          "system-ui",
+          "-apple-system",
+          "Segoe UI",
+          "Roboto",
+          "Helvetica Neue",
+          "Arial",
+          "sans-serif",
+        ],
       },
       borderRadius: {
         xl: "0.875rem",
