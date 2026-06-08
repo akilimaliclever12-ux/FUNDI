@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { WorkerWithRelations } from "@/types";
 import { WorkerImage } from "./worker-avatar";
+import { ProfessionIcon } from "./profession-icon";
 import { Rating } from "@/components/ui/rating";
 import { Badge } from "@/components/ui/badge";
 import { formatRate } from "@/lib/utils";
@@ -30,7 +31,10 @@ export function WorkerCard({ worker }: { worker: WorkerWithRelations }) {
 
       <div className="space-y-1.5 p-4">
         <div className="flex items-center justify-between gap-2">
-          <Badge variant="brand">{worker.profession?.name_fr ?? "Fundi"}</Badge>
+          <Badge variant="brand">
+            <ProfessionIcon slug={worker.profession?.slug ?? ""} className="mr-1 h-3.5 w-3.5" />
+            {worker.profession?.name_fr ?? "Fundi"}
+          </Badge>
           {worker.rating_count > 0 && (
             <Rating value={worker.rating_avg} count={worker.rating_count} />
           )}

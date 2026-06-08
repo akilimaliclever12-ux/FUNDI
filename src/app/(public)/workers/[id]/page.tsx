@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getWorkerById } from "@/lib/queries/workers";
 import { WorkerImage } from "@/components/features/worker-avatar";
+import { ProfessionIcon } from "@/components/features/profession-icon";
 import { ReviewForm } from "@/components/features/review-form";
 import { Rating } from "@/components/ui/rating";
 import { Badge } from "@/components/ui/badge";
@@ -52,7 +53,10 @@ export default async function WorkerProfilePage({
             />
             <div className="space-y-2 p-5">
               <div className="flex flex-wrap items-center gap-2">
-                <Badge variant="brand">{worker.profession?.name_fr ?? "Fundi"}</Badge>
+                <Badge variant="brand">
+                  <ProfessionIcon slug={worker.profession?.slug ?? ""} className="mr-1 h-3.5 w-3.5" />
+                  {worker.profession?.name_fr ?? "Fundi"}
+                </Badge>
                 <Badge variant="success">✓ Vérifié</Badge>
                 {worker.rating_count > 0 && (
                   <Rating value={worker.rating_avg} count={worker.rating_count} />
