@@ -42,13 +42,22 @@ export async function startConversation(workerId: string): Promise<StartResult> 
 
   if (existing) return { ok: true, conversationId: existing.id };
 
-  const { data: created, error } = await supabase
+  // NOTE: do NOT use .insert().select() here. The conversations SELECT policy
+  // calls a SECURITY DEFINER function that re-queries the table, and the
+  // just-inserted row isn't visible to that sub-query within the same insert
+  // statement (RLS returns 42501). Insert, then select separately.
+  const { error: insErr } = await supabase
     .from("conversations")
-    .insert({ worker_id: workerId, customer_user_id: user.id })
-    .select("id")
-    .single();
+    .insert({ worker_id: workerId, customer_user_id: user.id });
+  if (insErr) return { ok: false, error: "Impossible de démarrer la discussion." };
 
-  if (error || !created) return { ok: false, error: "Impossible de démarrer la discussion." };
+  const { data: created } = await supabase
+    .from("conversations")
+    .select("id")
+    .eq("worker_id", workerId)
+    .eq("customer_user_id", user.id)
+    .maybeSingle();
+  if (!created) return { ok: false, error: "Discussion créée mais introuvable." };
 
   // log a lead (analytics continuity)
   await supabase.from("leads").insert({
