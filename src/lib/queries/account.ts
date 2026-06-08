@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import type { WorkerWithRelations } from "@/types";
+import type { CredentialRow, ReferenceRow } from "@/types/database.types";
 
 export interface Account {
   userId: string;
@@ -8,6 +9,8 @@ export interface Account {
   email: string | null;
   role: "customer" | "worker" | null;
   worker: WorkerWithRelations | null;
+  credentials: CredentialRow[];
+  references: ReferenceRow[];
 }
 
 /** Full account context for the signed-in user (profile row + worker profile if any). */
@@ -36,6 +39,17 @@ export async function getAccount(): Promise<Account | null> {
     .is("deleted_at", null)
     .maybeSingle();
 
+  let credentials: CredentialRow[] = [];
+  let references: ReferenceRow[] = [];
+  if (w?.id) {
+    const [{ data: creds }, { data: refs }] = await Promise.all([
+      supabase.from("worker_credentials").select("*").eq("worker_id", w.id).order("created_at"),
+      supabase.from("worker_references").select("*").eq("worker_id", w.id).order("created_at"),
+    ]);
+    credentials = (creds as CredentialRow[]) ?? [];
+    references = (refs as ReferenceRow[]) ?? [];
+  }
+
   return {
     userId: user.id,
     fullName: u?.full_name ?? null,
@@ -43,6 +57,8 @@ export async function getAccount(): Promise<Account | null> {
     email: u?.email ?? user.email ?? null,
     role: (u?.role as Account["role"]) ?? null,
     worker: (w as unknown as WorkerWithRelations) ?? null,
+    credentials,
+    references,
   };
 }
 

@@ -124,3 +124,113 @@ export async function updateMyWorkerProfile(input: {
   revalidatePath("/workers");
   return { ok: true };
 }
+
+// ---- Credentials (certifications / diplomas / attestations) ----
+
+async function getMyWorkerId(): Promise<{ workerId: string | null; userId: string | null }> {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { workerId: null, userId: null };
+  const { data } = await supabase
+    .from("workers")
+    .select("id")
+    .eq("user_id", user.id)
+    .is("deleted_at", null)
+    .maybeSingle();
+  return { workerId: data?.id ?? null, userId: user.id };
+}
+
+export async function addCredential(input: {
+  type: "certification" | "diploma" | "attestation";
+  title: string;
+  storage_path: string;
+  url: string;
+}): Promise<Result> {
+  const supabase = createClient();
+  const { workerId } = await getMyWorkerId();
+  if (!workerId) return { ok: false, error: "Profil introuvable." };
+
+  const title = (input.title || "").trim();
+  if (title.length < 2) return { ok: false, error: "Titre requis." };
+  if (!input.storage_path || !input.url) return { ok: false, error: "Document requis." };
+  if (!["certification", "diploma", "attestation"].includes(input.type))
+    return { ok: false, error: "Type invalide." };
+
+  const { error } = await supabase.from("worker_credentials").insert({
+    worker_id: workerId,
+    type: input.type,
+    title,
+    storage_path: input.storage_path,
+    url: input.url,
+  });
+  if (error) return { ok: false, error: "Enregistrement échoué." };
+  revalidatePath("/compte");
+  revalidatePath(`/workers/${workerId}`);
+  return { ok: true };
+}
+
+export async function deleteCredential(id: string): Promise<Result> {
+  const supabase = createClient();
+  const { workerId } = await getMyWorkerId();
+  if (!workerId) return { ok: false, error: "Profil introuvable." };
+
+  const { data: cred } = await supabase
+    .from("worker_credentials")
+    .select("id, storage_path")
+    .eq("id", id)
+    .eq("worker_id", workerId)
+    .maybeSingle();
+  if (!cred) return { ok: false, error: "Introuvable." };
+
+  await supabase.from("worker_credentials").delete().eq("id", id);
+  if (cred.storage_path) {
+    try {
+      await createAdminClient().storage.from(PHOTOS_BUCKET).remove([cred.storage_path]);
+    } catch {
+      // best-effort
+    }
+  }
+  revalidatePath("/compte");
+  revalidatePath(`/workers/${workerId}`);
+  return { ok: true };
+}
+
+// ---- Reference persons (contact is private: owner + admin only) ----
+
+export async function addReference(input: {
+  name: string;
+  position: string;
+  contact: string;
+}): Promise<Result> {
+  const supabase = createClient();
+  const { workerId } = await getMyWorkerId();
+  if (!workerId) return { ok: false, error: "Profil introuvable." };
+
+  const name = (input.name || "").trim();
+  const contact = (input.contact || "").trim();
+  if (name.length < 2) return { ok: false, error: "Nom requis." };
+  if (contact.length < 3) return { ok: false, error: "Contact requis." };
+
+  const { error } = await supabase.from("worker_references").insert({
+    worker_id: workerId,
+    name,
+    position: (input.position || "").trim() || null,
+    contact,
+  });
+  if (error) return { ok: false, error: "Enregistrement échoué." };
+  revalidatePath("/compte");
+  revalidatePath(`/workers/${workerId}`);
+  return { ok: true };
+}
+
+export async function deleteReference(id: string): Promise<Result> {
+  const supabase = createClient();
+  const { workerId } = await getMyWorkerId();
+  if (!workerId) return { ok: false, error: "Profil introuvable." };
+  await supabase.from("worker_references").delete().eq("id", id).eq("worker_id", workerId);
+  revalidatePath("/compte");
+  revalidatePath(`/workers/${workerId}`);
+  return { ok: true };
+}

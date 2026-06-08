@@ -5,6 +5,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { PhotoUploader, type UploadedPhoto } from "./photo-uploader";
+import { CredentialsManager } from "./credentials-manager";
+import { ReferencesManager } from "./references-manager";
 import { updateMyName, updateMyWorkerProfile } from "@/app/compte/actions";
 import { normalizeDrcPhone } from "@/lib/phone";
 import type { Account } from "@/lib/queries/account";
@@ -121,6 +123,7 @@ export function AccountView({
 
       {/* Worker profile */}
       {worker ? (
+        <>
         <div className="card p-5">
           <div className="mb-3 flex items-center justify-between gap-2">
             <h3 className="font-semibold text-ink">Mon profil fundi</h3>
@@ -217,6 +220,15 @@ export function AccountView({
             {profileMsg && <p className="text-sm text-gray-600">{profileMsg}</p>}
           </form>
         </div>
+
+        {/* Extra credibility sections, available once the profile is active */}
+        {worker.status === "approved" && (
+          <>
+            <CredentialsManager credentials={account.credentials} />
+            <ReferencesManager references={account.references} />
+          </>
+        )}
+        </>
       ) : (
         <div className="card flex flex-col items-start gap-3 bg-brand-gradient-vivid p-5 text-white sm:flex-row sm:items-center sm:justify-between">
           <div>

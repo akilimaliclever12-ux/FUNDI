@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getWorkerById } from "@/lib/queries/workers";
+import { getWorkerById, getWorkerCredentials, getPublicReferences } from "@/lib/queries/workers";
 import { WorkerImage } from "@/components/features/worker-avatar";
 import { ProfessionIcon } from "@/components/features/profession-icon";
+import { CREDENTIAL_LABEL } from "@/lib/credentials";
 import { ReviewForm } from "@/components/features/review-form";
 import { Rating } from "@/components/ui/rating";
 import { Badge } from "@/components/ui/badge";
@@ -31,6 +32,11 @@ export default async function WorkerProfilePage({
 }) {
   const worker = await getWorkerById(params.id);
   if (!worker) notFound();
+
+  const [credentials, references] = await Promise.all([
+    getWorkerCredentials(worker.id),
+    getPublicReferences(worker.id),
+  ]);
 
   const photos = (worker.photos ?? []).filter((p) => p.type !== "verification");
   const cover = photos.find((p) => p.is_primary) ?? photos[0];
@@ -102,6 +108,40 @@ export default async function WorkerProfilePage({
                   />
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Credentials */}
+          {credentials.length > 0 && (
+            <div>
+              <h2 className="mb-3 font-semibold text-ink">Certifications & diplômes</h2>
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                {credentials.map((c) => (
+                  <a key={c.id} href={c.url} target="_blank" rel="noopener noreferrer" className="card overflow-hidden">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={c.url} alt={c.title} className="h-28 w-full object-cover" loading="lazy" />
+                    <div className="p-2">
+                      <p className="truncate text-sm font-medium text-ink">{c.title}</p>
+                      <p className="text-xs text-gray-400">{CREDENTIAL_LABEL[c.type]}</p>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Reference persons (contact hidden from public) */}
+          {references.length > 0 && (
+            <div>
+              <h2 className="mb-3 font-semibold text-ink">Personnes de référence</h2>
+              <ul className="space-y-2">
+                {references.map((r) => (
+                  <li key={r.id} className="card p-3">
+                    <p className="text-sm font-medium text-ink">{r.name}</p>
+                    {r.position && <p className="text-xs text-gray-500">{r.position}</p>}
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
 

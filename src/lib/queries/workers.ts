@@ -1,6 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { PAGE_SIZE } from "@/lib/constants";
 import type { SearchParams, WorkerWithRelations } from "@/types";
+import type { CredentialRow } from "@/types/database.types";
 
 const WORKER_SELECT = `
   *,
@@ -109,6 +111,34 @@ export async function getWorkerById(id: string): Promise<WorkerWithRelations | n
 
   if (!data) return null;
   return data as unknown as WorkerWithRelations;
+}
+
+/** Public credentials of an approved worker (certifications, diplomas, attestations). */
+export async function getWorkerCredentials(workerId: string): Promise<CredentialRow[]> {
+  const supabase = createClient();
+  const { data } = await supabase
+    .from("worker_credentials")
+    .select("*")
+    .eq("worker_id", workerId)
+    .order("created_at");
+  return (data as CredentialRow[]) ?? [];
+}
+
+/**
+ * Public reference persons: NAME + POSITION only (the contact is private).
+ * Uses the service role because the references table is owner/admin-only by RLS;
+ * we deliberately never select the `contact` column here.
+ */
+export async function getPublicReferences(
+  workerId: string,
+): Promise<{ id: string; name: string; position: string | null }[]> {
+  const admin = createAdminClient();
+  const { data } = await admin
+    .from("worker_references")
+    .select("id, name, position")
+    .eq("worker_id", workerId)
+    .order("created_at");
+  return data ?? [];
 }
 
 /** Ids of all approved workers (for sitemap / static params). */

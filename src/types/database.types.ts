@@ -129,6 +129,27 @@ export interface MessageRow {
   created_at: string;
 }
 
+export type CredentialType = "certification" | "diploma" | "attestation";
+
+export interface CredentialRow {
+  id: string;
+  worker_id: string;
+  type: CredentialType;
+  title: string;
+  storage_path: string;
+  url: string;
+  created_at: string;
+}
+
+export interface ReferenceRow {
+  id: string;
+  worker_id: string;
+  name: string;
+  position: string | null;
+  contact: string;
+  created_at: string;
+}
+
 export interface AdminUserRow {
   id: string;
   full_name: string;

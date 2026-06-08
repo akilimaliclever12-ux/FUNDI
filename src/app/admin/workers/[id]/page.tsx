@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { AdminWorkerActions } from "@/components/features/admin-worker-actions";
 import { Badge } from "@/components/ui/badge";
 import { formatRate } from "@/lib/utils";
+import { CREDENTIAL_LABEL } from "@/lib/credentials";
 
 export const dynamic = "force-dynamic";
 
@@ -23,6 +24,11 @@ export default async function AdminWorkerDetail({
 
   if (!worker) notFound();
   const w: any = worker;
+
+  const [{ data: credentials }, { data: references }] = await Promise.all([
+    supabase.from("worker_credentials").select("*").eq("worker_id", params.id).order("created_at"),
+    supabase.from("worker_references").select("*").eq("worker_id", params.id).order("created_at"),
+  ]);
 
   return (
     <div>
@@ -70,6 +76,43 @@ export default async function AdminWorkerDetail({
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Credentials */}
+          {(credentials?.length ?? 0) > 0 && (
+            <div>
+              <h3 className="mb-2 font-semibold text-ink">Certifications & diplômes</h3>
+              <div className="grid grid-cols-3 gap-2">
+                {(credentials ?? []).map((c: any) => (
+                  <a key={c.id} href={c.url} target="_blank" rel="noopener noreferrer" className="card overflow-hidden">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={c.url} alt={c.title} className="h-24 w-full object-cover" loading="lazy" />
+                    <div className="p-1.5">
+                      <p className="truncate text-xs font-medium text-ink">{c.title}</p>
+                      <p className="text-[10px] text-gray-400">{CREDENTIAL_LABEL[c.type as keyof typeof CREDENTIAL_LABEL]}</p>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Reference persons — contact visible to admin */}
+          {(references?.length ?? 0) > 0 && (
+            <div>
+              <h3 className="mb-2 font-semibold text-ink">Personnes de référence</h3>
+              <ul className="space-y-2">
+                {(references ?? []).map((r: any) => (
+                  <li key={r.id} className="card p-3 text-sm">
+                    <p className="font-medium text-ink">{r.name}</p>
+                    <p className="text-gray-500">
+                      {r.position ? `${r.position} · ` : ""}
+                      <span className="text-brand">{r.contact}</span>
+                    </p>
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
         </div>
