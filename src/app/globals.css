@@ -18,6 +18,25 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+/* Hero background slideshow — images scroll right -> left, endlessly */
+@keyframes hero-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.hero-marquee {
+  animation: hero-marquee 45s linear infinite;
+  will-change: transform;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-marquee {
+    animation: none;
+  }
+}
+
 /* Subtle logo watermark behind every page (fixed, very low opacity, tiny file) */
 .page-watermark {
   position: fixed;

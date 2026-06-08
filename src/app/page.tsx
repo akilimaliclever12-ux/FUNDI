@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getProfessions } from "@/lib/queries/reference";
 import { ProfessionIcon } from "@/components/features/profession-icon";
+import { HeroSlideshow } from "@/components/features/hero-slideshow";
 import { SITE_TAGLINE } from "@/lib/constants";
 
 export const revalidate = 3600; // ISR: refresh hourly
@@ -10,9 +11,15 @@ export default async function HomePage() {
 
   return (
     <div>
-      {/* Hero — signature black→blue gradient */}
-      <section className="bg-brand-gradient text-white">
-        <div className="container-page py-14 sm:py-20">
+      {/* Hero — animated worker photos behind a navy overlay */}
+      <section className="relative overflow-hidden bg-brand text-white">
+        <HeroSlideshow />
+        {/* navy overlay: dark on the left (text), photos show through on the right */}
+        <div
+          className="absolute inset-0 bg-gradient-to-r from-ink/95 via-brand/85 to-brand/55"
+          aria-hidden="true"
+        />
+        <div className="container-page relative z-10 py-14 sm:py-20">
           <h1 className="max-w-2xl text-3xl font-bold leading-tight sm:text-5xl">
             {SITE_TAGLINE}
           </h1>
