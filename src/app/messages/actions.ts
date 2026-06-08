@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendEmail, newMessageEmail } from "@/lib/email";
+import { sendPushToUser } from "@/lib/push";
 
 export interface StartResult {
   ok: boolean;
@@ -147,8 +148,19 @@ async function notifyRecipient(conversationId: string, senderId: string, preview
     supabase.from("users").select("email").eq("id", recipientId).maybeSingle(),
     supabase.from("users").select("full_name").eq("id", senderId).maybeSingle(),
   ]);
-  if (!recipient?.email) return;
+  const senderName = sender?.full_name ?? "Quelqu'un";
 
-  const mail = newMessageEmail(sender?.full_name ?? "Quelqu'un", preview, conversationId);
-  await sendEmail({ to: recipient.email, subject: mail.subject, html: mail.html });
+  // 1) Web push (no-op if the recipient has no device subscribed / VAPID unset)
+  await sendPushToUser(recipientId, {
+    title: `Nouveau message de ${senderName}`,
+    body: preview.slice(0, 120),
+    url: `/messages/${conversationId}`,
+    tag: `conv-${conversationId}`,
+  });
+
+  // 2) Email fallback (only if the recipient has an email + Resend configured)
+  if (recipient?.email) {
+    const mail = newMessageEmail(senderName, preview, conversationId);
+    await sendEmail({ to: recipient.email, subject: mail.subject, html: mail.html });
+  }
 }

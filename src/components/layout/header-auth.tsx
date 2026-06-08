@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { LogoutButton } from "@/components/features/logout-button";
+import { MessagesLink } from "@/components/features/messages-link";
 
 /**
  * Client-side auth island. Keeps the Header a static server component (no
@@ -31,9 +32,7 @@ export function HeaderAuth() {
   if (signedIn) {
     return (
       <>
-        <Link href="/messages" className="rounded-lg px-3 py-2 hover:bg-gray-50 hover:text-ink">
-          Messages
-        </Link>
+        <MessagesLink className="rounded-lg px-3 py-2 hover:bg-gray-50 hover:text-ink" />
         <Link href="/compte" className="rounded-lg px-3 py-2 hover:bg-gray-50 hover:text-ink">
           Compte
         </Link>
