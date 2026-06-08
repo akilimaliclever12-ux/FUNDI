@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getProfessions, getLocations } from "@/lib/queries/reference";
+import { getProfessions, getCommunes } from "@/lib/queries/reference";
 import { OnboardingWizard } from "@/components/features/onboarding-wizard";
 
 export const metadata: Metadata = {
@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 };
 
 export default async function JoinPage() {
-  const [professions, locations] = await Promise.all([getProfessions(), getLocations()]);
+  const [professions, communes] = await Promise.all([getProfessions(), getCommunes()]);
 
   return (
     <div className="container-page max-w-xl py-8">
@@ -21,7 +21,7 @@ export default async function JoinPage() {
       <div className="mt-6">
         <OnboardingWizard
           professions={professions.map((p) => ({ id: p.id, name_fr: p.name_fr }))}
-          locations={locations.map((l) => ({ id: l.id, name: l.name, type: l.type }))}
+          communes={communes}
         />
       </div>
     </div>

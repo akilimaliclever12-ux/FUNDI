@@ -5,25 +5,29 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { PhotoUploader, type UploadedPhoto } from "./photo-uploader";
 import { createWorkerProfile } from "@/app/(worker)/rejoindre/actions";
-import type { ProfessionRow, LocationRow } from "@/types/database.types";
+import type { ProfessionRow } from "@/types/database.types";
+import type { CommuneNode } from "@/types";
 
 type Step = "phone" | "otp" | "profile" | "done";
 
 export function OnboardingWizard({
   professions,
-  locations,
+  communes,
 }: {
   professions: Pick<ProfessionRow, "id" | "name_fr">[];
-  locations: Pick<LocationRow, "id" | "name" | "type">[];
+  communes: CommuneNode[];
 }) {
   const router = useRouter();
   const supabase = createClient();
   const [step, setStep] = useState<Step>("phone");
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
+  const [communeId, setCommuneId] = useState("");
   const [photos, setPhotos] = useState<UploadedPhoto[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const quartierOptions = communes.find((c) => c.id === communeId)?.quartiers ?? [];
 
   async function sendOtp(e: React.FormEvent) {
     e.preventDefault();
@@ -142,16 +146,35 @@ export function OnboardingWizard({
               </select>
             </div>
             <div>
-              <label className="label" htmlFor="location_id">Quartier</label>
-              <select id="location_id" name="location_id" className="input" required>
+              <label className="label" htmlFor="commune_id">Commune</label>
+              <select
+                id="commune_id"
+                className="input"
+                required
+                value={communeId}
+                onChange={(e) => setCommuneId(e.target.value)}
+              >
                 <option value="">Choisir…</option>
-                {locations.map((l) => (
-                  <option key={l.id} value={l.id}>
-                    {l.type === "quartier" ? "— " : ""}{l.name}
-                  </option>
+                {communes.map((c) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
               </select>
             </div>
+          </div>
+          <div>
+            <label className="label" htmlFor="location_id">Quartier</label>
+            <select
+              id="location_id"
+              name="location_id"
+              className="input disabled:bg-gray-50 disabled:text-gray-400"
+              required
+              disabled={!communeId}
+            >
+              <option value="">{communeId ? "Choisir…" : "Choisissez d'abord une commune"}</option>
+              {quartierOptions.map((qt) => (
+                <option key={qt.id} value={qt.id}>{qt.name}</option>
+              ))}
+            </select>
           </div>
           <div>
             <label className="label" htmlFor="headline">Titre (une phrase)</label>

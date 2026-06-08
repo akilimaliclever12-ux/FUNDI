@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { searchWorkers } from "@/lib/queries/workers";
-import { getProfessions, getLocations } from "@/lib/queries/reference";
+import { getProfessions, getCommunes } from "@/lib/queries/reference";
 import { WorkerCard } from "@/components/features/worker-card";
 import { SearchFilters } from "@/components/features/search-filters";
 import { PROFESSION_LABELS } from "@/lib/constants";
@@ -24,10 +24,10 @@ export default async function WorkersPage({
 }: {
   searchParams: SearchParams;
 }) {
-  const [{ workers, total, page, pageCount }, professions, locations] = await Promise.all([
+  const [{ workers, total, page, pageCount }, professions, communes] = await Promise.all([
     searchWorkers(searchParams),
     getProfessions(),
-    getLocations(),
+    getCommunes(),
   ]);
 
   function pageHref(p: number) {
@@ -44,7 +44,7 @@ export default async function WorkersPage({
       <div className="mt-4">
         <SearchFilters
           professions={professions.map((p) => ({ slug: p.slug, name_fr: p.name_fr }))}
-          locations={locations.map((l) => ({ slug: l.slug, name: l.name, type: l.type }))}
+          communes={communes}
         />
       </div>
 

@@ -16,7 +16,21 @@ export interface WorkerWithRelations extends WorkerRow {
 
 export interface SearchParams {
   profession?: string; // profession slug
-  location?: string; // location slug
+  commune?: string; // commune slug
+  quartier?: string; // quartier slug
   q?: string; // keyword
   page?: string;
+}
+
+export interface QuartierNode {
+  id: string;
+  slug: string;
+  name: string;
+}
+
+export interface CommuneNode {
+  id: string;
+  slug: string;
+  name: string;
+  quartiers: QuartierNode[];
 }

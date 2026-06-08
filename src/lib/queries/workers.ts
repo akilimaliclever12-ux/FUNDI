@@ -25,7 +25,7 @@ export async function searchWorkers(params: SearchParams): Promise<WorkerListRes
 
   // Resolve slugs -> ids first (reliable filtering on the workers table itself).
   let professionId: string | null = null;
-  let locationId: string | null = null;
+  let locationIds: string[] | null = null;
   if (params.profession) {
     const { data } = await supabase
       .from("professions")
@@ -35,14 +35,28 @@ export async function searchWorkers(params: SearchParams): Promise<WorkerListRes
     professionId = data?.id ?? null;
     if (!professionId) return { workers: [], total: 0, page, pageCount: 0 };
   }
-  if (params.location) {
+  if (params.quartier) {
+    // most specific: a single quartier
     const { data } = await supabase
       .from("locations")
       .select("id")
-      .eq("slug", params.location)
+      .eq("slug", params.quartier)
       .maybeSingle();
-    locationId = data?.id ?? null;
-    if (!locationId) return { workers: [], total: 0, page, pageCount: 0 };
+    if (!data) return { workers: [], total: 0, page, pageCount: 0 };
+    locationIds = [data.id as string];
+  } else if (params.commune) {
+    // a commune: include the commune itself + all its quartiers
+    const { data: commune } = await supabase
+      .from("locations")
+      .select("id")
+      .eq("slug", params.commune)
+      .maybeSingle();
+    if (!commune) return { workers: [], total: 0, page, pageCount: 0 };
+    const { data: kids } = await supabase
+      .from("locations")
+      .select("id")
+      .eq("parent_id", commune.id);
+    locationIds = [commune.id as string, ...(kids ?? []).map((k) => k.id as string)];
   }
 
   let query = supabase
@@ -52,7 +66,7 @@ export async function searchWorkers(params: SearchParams): Promise<WorkerListRes
     .is("deleted_at", null);
 
   if (professionId) query = query.eq("profession_id", professionId);
-  if (locationId) query = query.eq("location_id", locationId);
+  if (locationIds) query = query.in("location_id", locationIds);
   if (params.q && params.q.trim()) {
     // full-text search on the maintained tsvector, fallback to ilike on headline
     const term = params.q.trim();
