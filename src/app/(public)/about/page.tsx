@@ -33,7 +33,7 @@ export default function AboutPage() {
           <ol className="list-decimal space-y-1 pl-5">
             <li>Cherchez par métier et par quartier.</li>
             <li>Comparez les profils, les photos et les avis.</li>
-            <li>Contactez le fundi directement sur WhatsApp.</li>
+            <li>Discutez avec le fundi directement sur Fundi.</li>
           </ol>
         </section>
 

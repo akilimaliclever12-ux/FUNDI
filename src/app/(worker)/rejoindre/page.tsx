@@ -15,7 +15,7 @@ export default async function JoinPage() {
       <h1 className="text-2xl font-bold text-ink">Devenir fundi</h1>
       <p className="mt-1 text-gray-600">
         Créez votre profil gratuitement. Vérifiez votre numéro, remplissez vos infos, ajoutez des
-        photos — et recevez des clients sur WhatsApp.
+        photos — et recevez des clients directement sur Fundi.
       </p>
 
       <div className="mt-6">

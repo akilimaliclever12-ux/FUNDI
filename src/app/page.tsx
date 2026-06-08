@@ -17,7 +17,7 @@ export default async function HomePage() {
           </h1>
           <p className="mt-4 max-w-xl text-base text-blue-100 sm:text-lg">
             Électriciens, plombiers, menuisiers, maçons, soudeurs, peintres — vérifiés et
-            joignables sur WhatsApp, près de chez vous à Bukavu.
+            joignables directement sur Fundi, près de chez vous à Bukavu.
           </p>
 
           <form action="/workers" className="mt-8 flex max-w-md gap-2">
@@ -66,7 +66,7 @@ export default async function HomePage() {
           {[
             { t: "1. Cherchez", d: "Filtrez par métier et quartier pour trouver le bon fundi." },
             { t: "2. Vérifiez", d: "Profils vérifiés, photos de travaux et avis clients réels." },
-            { t: "3. Contactez", d: "Un clic pour discuter directement sur WhatsApp." },
+            { t: "3. Contactez", d: "Discutez directement avec le fundi, ici sur Fundi." },
           ].map((s) => (
             <div key={s.t} className="card p-5">
               <h3 className="font-semibold text-ink">{s.t}</h3>
