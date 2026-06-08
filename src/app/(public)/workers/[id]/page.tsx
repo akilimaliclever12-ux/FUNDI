@@ -87,7 +87,7 @@ export default async function WorkerProfilePage({
           {/* Gallery */}
           {gallery.length > 0 && (
             <div>
-              <h2 className="mb-3 font-semibold text-ink">Travaux récents</h2>
+              <h2 className="mb-3 font-semibold text-ink">Portfolio</h2>
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                 {gallery.map((p) => (
                   // eslint-disable-next-line @next/next/no-img-element

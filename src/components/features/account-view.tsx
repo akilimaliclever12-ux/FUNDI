@@ -180,20 +180,20 @@ export function AccountView({
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="label" htmlFor="hourly_rate_min">Tarif min (FC)</label>
-                <input id="hourly_rate_min" name="hourly_rate_min" type="number" min={0} className="input" defaultValue={worker.hourly_rate_min ?? ""} />
+                <input id="hourly_rate_min" name="hourly_rate_min" type="number" min={0} className="input" defaultValue={worker.hourly_rate_min ?? ""} required />
               </div>
               <div>
                 <label className="label" htmlFor="hourly_rate_max">Tarif max (FC)</label>
-                <input id="hourly_rate_max" name="hourly_rate_max" type="number" min={0} className="input" defaultValue={worker.hourly_rate_max ?? ""} />
+                <input id="hourly_rate_max" name="hourly_rate_max" type="number" min={0} className="input" defaultValue={worker.hourly_rate_max ?? ""} required />
               </div>
             </div>
             <div>
               <label className="label" htmlFor="bio">Présentation</label>
-              <textarea id="bio" name="bio" className="input" rows={3} maxLength={1500} defaultValue={worker.bio ?? ""} />
+              <textarea id="bio" name="bio" className="input" rows={3} minLength={20} maxLength={1500} defaultValue={worker.bio ?? ""} required />
             </div>
 
             <div>
-              <span className="label">Photos</span>
+              <span className="label">Portfolio — photos de vos travaux</span>
               {keptPhotos.length > 0 && (
                 <div className="mb-2 grid grid-cols-3 gap-2">
                   {keptPhotos.map((p) => (

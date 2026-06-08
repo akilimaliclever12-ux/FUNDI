@@ -55,20 +55,30 @@ export async function updateMyWorkerProfile(input: {
   if (!parsed.success) return { ok: false, error: "Formulaire invalide." };
   const p = parsed.data;
 
+  // A complete profile must keep at least one portfolio photo.
+  const { count: currentPhotos } = await supabase
+    .from("worker_photos")
+    .select("*", { count: "exact", head: true })
+    .eq("worker_id", worker.id)
+    .neq("type", "verification");
+  const finalCount =
+    (currentPhotos ?? 0) - (input.deletedPhotoIds?.length ?? 0) + (input.newPhotos?.length ?? 0);
+  if (finalCount < 1) {
+    return { ok: false, error: "Gardez au moins une photo dans votre portfolio." };
+  }
+
   const { error: upErr } = await supabase
     .from("workers")
     .update({
       profession_id: p.profession_id,
       location_id: p.location_id,
       headline: p.headline,
-      bio: p.bio || null,
+      bio: p.bio,
       years_experience: p.years_experience,
       whatsapp_number: p.whatsapp_number,
-      hourly_rate_min: p.hourly_rate_min ?? null,
-      hourly_rate_max: p.hourly_rate_max ?? null,
-      // re-moderate after a self-edit
-      status: "pending",
-      approved_at: null,
+      hourly_rate_min: p.hourly_rate_min,
+      hourly_rate_max: p.hourly_rate_max,
+      // stays active; only the admin can suspend/reject
     })
     .eq("id", worker.id);
   if (upErr) return { ok: false, error: "Mise à jour échouée." };

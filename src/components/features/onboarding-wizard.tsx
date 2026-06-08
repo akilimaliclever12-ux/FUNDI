@@ -100,6 +100,9 @@ export function OnboardingWizard({
     if (!whatsapp) {
       return setError("Numéro WhatsApp invalide. Exemple : 097 000 0000");
     }
+    if (photos.length < 1) {
+      return setError("Ajoutez au moins une photo dans votre portfolio.");
+    }
     setBusy(true);
     const profile = {
       full_name: fd.get("full_name"),
@@ -111,8 +114,8 @@ export function OnboardingWizard({
       headline: fd.get("headline"),
       bio: fd.get("bio"),
       years_experience: fd.get("years_experience"),
-      hourly_rate_min: fd.get("hourly_rate_min") || undefined,
-      hourly_rate_max: fd.get("hourly_rate_max") || undefined,
+      hourly_rate_min: fd.get("hourly_rate_min"),
+      hourly_rate_max: fd.get("hourly_rate_max"),
     };
     const res = await createWorkerProfile({ profile, photos });
     setBusy(false);
@@ -124,13 +127,19 @@ export function OnboardingWizard({
     return (
       <div className="card p-6 text-center">
         <div className="text-3xl">🎉</div>
-        <h2 className="mt-2 text-xl font-bold text-ink">Profil envoyé !</h2>
+        <h2 className="mt-2 text-xl font-bold text-ink">Profil actif !</h2>
         <p className="mt-1 text-gray-600">
-          Votre profil est en cours de vérification. Vous serez visible dès qu&apos;il est approuvé.
+          Félicitations, votre profil est en ligne et visible par les clients. Ajoutez vos
+          certifications, diplômes et références depuis votre compte pour inspirer plus confiance.
         </p>
-        <button onClick={() => router.push("/")} className="btn-primary mt-4">
-          Retour à l&apos;accueil
-        </button>
+        <div className="mt-4 flex justify-center gap-2">
+          <button onClick={() => router.push("/compte")} className="btn-primary">
+            Compléter mon profil
+          </button>
+          <button onClick={() => router.push("/")} className="btn-ghost">
+            Accueil
+          </button>
+        </div>
       </div>
     );
   }
@@ -262,20 +271,21 @@ export function OnboardingWizard({
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="label" htmlFor="hourly_rate_min">Tarif min (FC)</label>
-              <input id="hourly_rate_min" name="hourly_rate_min" type="number" min={0} className="input" />
+              <input id="hourly_rate_min" name="hourly_rate_min" type="number" min={0} className="input" required />
             </div>
             <div>
               <label className="label" htmlFor="hourly_rate_max">Tarif max (FC)</label>
-              <input id="hourly_rate_max" name="hourly_rate_max" type="number" min={0} className="input" />
+              <input id="hourly_rate_max" name="hourly_rate_max" type="number" min={0} className="input" required />
             </div>
           </div>
           <div>
             <label className="label" htmlFor="bio">Présentation</label>
-            <textarea id="bio" name="bio" className="input" rows={3} maxLength={1500} />
+            <textarea id="bio" name="bio" className="input" rows={3} minLength={20} maxLength={1500} required />
           </div>
           <div>
-            <span className="label">Photos de vos travaux</span>
+            <span className="label">Portfolio — photos de vos travaux (obligatoire)</span>
             <PhotoUploader value={photos} onChange={setPhotos} />
+            <p className="mt-1 text-xs text-gray-400">Au moins 1 photo. Un portfolio attire plus de clients.</p>
           </div>
           <button className="btn-gradient w-full" disabled={busy}>
             {busy ? "Envoi…" : "Créer mon profil"}

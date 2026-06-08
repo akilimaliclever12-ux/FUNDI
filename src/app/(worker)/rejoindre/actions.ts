@@ -30,6 +30,11 @@ export async function createWorkerProfile(input: {
   }
   const p = parsed.data;
 
+  // At least one portfolio photo is required.
+  if (!Array.isArray(input.photos) || input.photos.length < 1) {
+    return { ok: false, error: "Ajoutez au moins une photo de vos travaux (portfolio)." };
+  }
+
   // 1) upsert the user profile row (1:1 with auth user)
   const { error: userErr } = await supabase.from("users").upsert(
     {
@@ -57,10 +62,12 @@ export async function createWorkerProfile(input: {
       bio: p.bio || null,
       years_experience: p.years_experience,
       service_areas: p.service_areas ?? null,
-      hourly_rate_min: p.hourly_rate_min ?? null,
-      hourly_rate_max: p.hourly_rate_max ?? null,
+      hourly_rate_min: p.hourly_rate_min,
+      hourly_rate_max: p.hourly_rate_max,
       whatsapp_number: p.whatsapp_number,
-      status: "pending",
+      // Profile is complete (all fields + a photo are required) -> active & approved.
+      status: "approved",
+      approved_at: new Date().toISOString(),
     })
     .select("id")
     .single();
