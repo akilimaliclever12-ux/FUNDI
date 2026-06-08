@@ -29,18 +29,33 @@ from (values
 cross join (select id from public.locations where slug = 'bukavu') c
 on conflict (slug) do nothing;
 
--- A few well-known quartiers (extend as needed)
+-- Quartiers of Bukavu (3 communes). Source of truth.
 insert into public.locations (slug, name, type, parent_id)
 select v.slug, v.name, 'quartier'::location_type, p.id
 from (values
-  ('ndendere',     'Ndendere',     'ibanda'),
-  ('nyalukemba',   'Nyalukemba',   'ibanda'),
-  ('panzi',        'Panzi',        'ibanda'),
-  ('nyakaliba',    'Nyakaliba',    'kadutu'),
-  ('cimpunda',     'Cimpunda',     'kadutu'),
-  ('mosala',       'Mosala',       'kadutu'),
-  ('lumu',         'Lumu',         'bagira'),
-  ('nyamoma',      'Nyamoma',      'bagira')
+  -- IBANDA
+  ('ndendere',   'Ndendere',   'ibanda'),
+  ('nyalukemba', 'Nyalukemba', 'ibanda'),
+  ('panzi',      'Panzi',      'ibanda'),
+  -- BAGIRA
+  ('lumumba',    'Lumumba',    'bagira'),
+  ('nyakavogo',  'Nyakavogo',  'bagira'),
+  ('mulambula',  'Mulambula',  'bagira'),
+  ('chikera',    'Chikera',    'bagira'),
+  ('chikonyi',   'Chikonyi',   'bagira'),
+  ('ciriri',     'Ciriri',     'bagira'),
+  ('kanoshe',    'Kanoshe',    'bagira'),
+  ('mulwa',      'Mulwa',      'bagira'),
+  ('kasha',      'Kasha',      'bagira'),
+  ('chahi',      'Chahi',      'bagira'),
+  -- KADUTU
+  ('cimpunda',   'Cimpunda',   'kadutu'),
+  ('mosala',     'Mosala',     'kadutu'),
+  ('kasali',     'Kasali',     'kadutu'),
+  ('nyamugo',    'Nyamugo',    'kadutu'),
+  ('nkafu',      'Nkafu',      'kadutu'),
+  ('nyakaliba',  'Nyakaliba',  'kadutu'),
+  ('kajangu',    'Kajangu',    'kadutu')
 ) as v(slug, name, parent_slug)
 join public.locations p on p.slug = v.parent_slug
 on conflict (slug) do nothing;
