@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getProfessions } from "@/lib/queries/reference";
+import { ProfessionIcon } from "@/components/features/profession-icon";
 import { SITE_TAGLINE } from "@/lib/constants";
 
 export const revalidate = 3600; // ISR: refresh hourly
@@ -52,7 +53,7 @@ export default async function HomePage() {
               className="card flex items-center gap-3 p-4 transition hover:border-brand/40 hover:shadow"
             >
               <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-accent/10 text-accent-dark">
-                ●
+                <ProfessionIcon slug={p.slug} className="h-5 w-5" />
               </span>
               <span className="font-medium text-ink">{p.name_fr}</span>
             </Link>
