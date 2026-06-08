@@ -34,6 +34,9 @@ export function HeaderAuth() {
         <Link href="/messages" className="rounded-lg px-3 py-2 hover:bg-gray-50 hover:text-ink">
           Messages
         </Link>
+        <Link href="/compte" className="rounded-lg px-3 py-2 hover:bg-gray-50 hover:text-ink">
+          Compte
+        </Link>
         <LogoutButton className="ml-1 px-3 py-2 text-xs sm:text-sm" />
       </>
     );

@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { getProfessions, getCommunes } from "@/lib/queries/reference";
+import { createClient } from "@/lib/supabase/server";
+import { hasWorkerProfile } from "@/lib/queries/account";
 import { OnboardingWizard } from "@/components/features/onboarding-wizard";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Devenir fundi",
@@ -8,6 +13,16 @@ export const metadata: Metadata = {
 };
 
 export default async function JoinPage() {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  // Already a fundi? Don't offer to create a second profile — send to account.
+  if (user && (await hasWorkerProfile())) {
+    redirect("/compte");
+  }
+
   const [professions, communes] = await Promise.all([getProfessions(), getCommunes()]);
 
   return (
@@ -22,6 +37,8 @@ export default async function JoinPage() {
         <OnboardingWizard
           professions={professions.map((p) => ({ id: p.id, name_fr: p.name_fr }))}
           communes={communes}
+          // a logged-in user without a worker profile skips the auth step
+          alreadyAuthed={!!user}
         />
       </div>
     </div>

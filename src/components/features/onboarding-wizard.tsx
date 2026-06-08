@@ -17,13 +17,16 @@ type Method = "email" | "phone";
 export function OnboardingWizard({
   professions,
   communes,
+  alreadyAuthed = false,
 }: {
   professions: Pick<ProfessionRow, "id" | "name_fr">[];
   communes: CommuneNode[];
+  alreadyAuthed?: boolean;
 }) {
   const router = useRouter();
   const supabase = createClient();
-  const [step, setStep] = useState<Step>("auth");
+  // Logged-in users (e.g. a customer becoming a fundi) skip straight to the profile.
+  const [step, setStep] = useState<Step>(alreadyAuthed ? "profile" : "auth");
   const [method, setMethod] = useState<Method>(SMS_ENABLED ? "phone" : "email");
   const [emailMode, setEmailMode] = useState<"signup" | "login">("signup");
 
