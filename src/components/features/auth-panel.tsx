@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { getMyProfileState, ensureCustomerProfile } from "@/app/connexion/actions";
 import { normalizeDrcPhone } from "@/lib/phone";
+import { SMS_ENABLED } from "@/lib/config";
 import { cn } from "@/lib/utils";
 
 type Method = "phone" | "email";
@@ -13,7 +14,7 @@ type Step = "auth" | "otp" | "name";
 export function AuthPanel({ next = "/messages" }: { next?: string }) {
   const router = useRouter();
   const supabase = createClient();
-  const [method, setMethod] = useState<Method>("phone");
+  const [method, setMethod] = useState<Method>(SMS_ENABLED ? "phone" : "email");
   const [step, setStep] = useState<Step>("auth");
   const [emailMode, setEmailMode] = useState<"login" | "signup">("login");
 
@@ -111,25 +112,27 @@ export function AuthPanel({ next = "/messages" }: { next?: string }) {
     <div className="card space-y-4 p-5">
       {step === "auth" && (
         <>
-          {/* method tabs */}
-          <div className="grid grid-cols-2 gap-1 rounded-xl bg-gray-100 p-1 text-sm font-medium">
-            <button
-              type="button"
-              onClick={() => { setMethod("phone"); setError(null); }}
-              className={cn("rounded-lg py-2", method === "phone" ? "bg-white text-ink shadow-sm" : "text-gray-500")}
-            >
-              Téléphone
-            </button>
-            <button
-              type="button"
-              onClick={() => { setMethod("email"); setError(null); }}
-              className={cn("rounded-lg py-2", method === "email" ? "bg-white text-ink shadow-sm" : "text-gray-500")}
-            >
-              Email
-            </button>
-          </div>
+          {/* method tabs — phone only shown when SMS is configured */}
+          {SMS_ENABLED && (
+            <div className="grid grid-cols-2 gap-1 rounded-xl bg-gray-100 p-1 text-sm font-medium">
+              <button
+                type="button"
+                onClick={() => { setMethod("phone"); setError(null); }}
+                className={cn("rounded-lg py-2", method === "phone" ? "bg-white text-ink shadow-sm" : "text-gray-500")}
+              >
+                Téléphone
+              </button>
+              <button
+                type="button"
+                onClick={() => { setMethod("email"); setError(null); }}
+                className={cn("rounded-lg py-2", method === "email" ? "bg-white text-ink shadow-sm" : "text-gray-500")}
+              >
+                Email
+              </button>
+            </div>
+          )}
 
-          {method === "phone" && (
+          {method === "phone" && SMS_ENABLED && (
             <form onSubmit={sendOtp} className="space-y-3">
               <div>
                 <label className="label" htmlFor="phone">Numéro de téléphone</label>

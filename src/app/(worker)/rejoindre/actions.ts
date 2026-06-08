@@ -38,7 +38,9 @@ export async function createWorkerProfile(input: {
       full_name: p.full_name,
       phone: p.phone,
       whatsapp_number: p.whatsapp_number,
-      is_phone_verified: true,
+      email: user.email ?? null,
+      // verified only when they came through phone OTP (phone === auth phone)
+      is_phone_verified: !!user.phone && `+${user.phone.replace(/[^\d]/g, "")}` === p.phone,
     },
     { onConflict: "id" },
   );
