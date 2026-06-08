@@ -14,7 +14,7 @@ export function ChatThread({
   myUserId: string;
   initialMessages: MessageRow[];
 }) {
-  const supabase = createClient();
+  const [supabase] = useState(() => createClient());
   const [messages, setMessages] = useState<MessageRow[]>(initialMessages);
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);

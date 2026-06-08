@@ -1,6 +1,7 @@
 // Minimal service worker — enables installability + a fast offline shell.
-// Network-first for navigations (so content stays fresh), cache fallback offline.
-const CACHE = "fundi-v2";
+// Network-first for navigations; passes through assets safely (never serves
+// HTML for a JS/CSS request, which would cause ChunkLoadError).
+const CACHE = "fundi-v3";
 const ASSETS = ["/", "/logo.png", "/icon-192.png", "/manifest.webmanifest"];
 
 self.addEventListener("install", (event) => {
@@ -22,20 +23,39 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   const req = event.request;
   if (req.method !== "GET") return;
-  // Don't cache API, auth, or admin — always go to network.
+
   const url = new URL(req.url);
+  // Only handle same-origin requests. Never touch cross-origin (Supabase REST,
+  // realtime, etc.) or API/admin — let the browser handle them directly.
+  if (url.origin !== location.origin) return;
   if (url.pathname.startsWith("/api") || url.pathname.startsWith("/admin")) return;
 
+  // Navigations: network-first, fall back to cached page or offline shell.
+  if (req.mode === "navigate") {
+    event.respondWith(
+      fetch(req)
+        .then((res) => {
+          const copy = res.clone();
+          caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {});
+          return res;
+        })
+        .catch(() => caches.match(req).then((r) => r || caches.match("/"))),
+    );
+    return;
+  }
+
+  // Static assets (JS/CSS/images): try network, fall back to cache, else FAIL
+  // (return the network error). Never substitute HTML for an asset.
   event.respondWith(
     fetch(req)
       .then((res) => {
-        if (res.ok && url.origin === location.origin) {
+        if (res.ok) {
           const copy = res.clone();
           caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {});
         }
         return res;
       })
-      .catch(() => caches.match(req).then((r) => r || caches.match("/"))),
+      .catch(() => caches.match(req)),
   );
 });
 
