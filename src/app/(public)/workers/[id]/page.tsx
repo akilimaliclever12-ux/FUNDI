@@ -131,7 +131,7 @@ export default async function WorkerProfilePage({
         <aside className="lg:col-span-1">
           <div className="card space-y-3 p-5 lg:sticky lg:top-20">
             <p className="text-sm text-gray-600">Intéressé par ce fundi ?</p>
-            <Link href={`/messages/start?worker=${worker.id}`} className="btn-gradient w-full">
+            <Link href={`/messages/start?worker=${worker.id}`} className="btn-accent w-full">
               💬 Discuter avec ce fundi
             </Link>
             <p className="text-center text-xs text-gray-400">

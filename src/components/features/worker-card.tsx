@@ -23,7 +23,7 @@ export function WorkerCard({ worker }: { worker: WorkerWithRelations }) {
         />
         {worker.is_featured && (
           <span className="absolute left-2 top-2">
-            <Badge variant="brand">⭐ En vedette</Badge>
+            <Badge variant="accent">⭐ En vedette</Badge>
           </span>
         )}
       </div>

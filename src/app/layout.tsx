@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { PwaRegister } from "@/components/pwa-register";
 import { SITE_NAME, SITE_TAGLINE, SITE_DESCRIPTION, SITE_URL } from "@/lib/constants";
 
 // Use a native system font stack (see tailwind.config sans): zero web-font
@@ -25,7 +26,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0A0F1F",
+  themeColor: "#0A2C5E",
   width: "device-width",
   initialScale: 1,
 };
@@ -38,9 +39,11 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body className="flex min-h-screen flex-col antialiased">
+        <div className="page-watermark" aria-hidden />
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />
+        <PwaRegister />
       </body>
     </html>
   );

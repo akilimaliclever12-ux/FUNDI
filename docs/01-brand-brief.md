@@ -125,7 +125,9 @@ Supporting pillars:
 
 ## 12. Color Palette Recommendations
 
-**Brand direction: a black → blue gradient.** Modern, premium, high-tech and trustworthy — reads beautifully on phone screens and stands out against the bright, dusty backdrops common in Bukavu. The gradient is the signature; supporting neutrals keep content legible and bandwidth low.
+> **UPDATE (logo adopted):** The official Fundi logo (navy-blue + orange handshake "F") is now the source of truth for brand colors. The app palette is **navy `#0A2C5E` (primary) + orange `#F4731C` (accent)** on white, with a navy gradient `linear-gradient(135deg,#0A2C5E→#16498F)` for hero/headers and orange for key CTAs ("Devenir fundi", "Discuter") and accents. The black→blue gradient direction below is superseded.
+
+**Original direction (superseded): a black → blue gradient.** Modern, premium, high-tech and trustworthy — reads beautifully on phone screens and stands out against the bright, dusty backdrops common in Bukavu. The gradient is the signature; supporting neutrals keep content legible and bandwidth low.
 
 ### Signature gradient
 | Role | Definition | Notes |

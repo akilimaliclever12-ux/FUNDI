@@ -8,27 +8,32 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Brand: black -> blue gradient system (see docs/01-brand-brief.md)
+        // Brand palette derived from the Fundi logo: navy blue + orange.
         ink: {
-          DEFAULT: "#0A0F1F", // brand black
-          900: "#0A0F1F",
-          950: "#05080F",
+          DEFAULT: "#0A2240", // deep navy ink (text)
+          900: "#0A2240",
+          950: "#061629",
         },
         brand: {
-          DEFAULT: "#0B5FFF", // primary blue
-          dark: "#0A2540",
-          bright: "#3B82F6",
-          glow: "#60A5FA",
+          DEFAULT: "#0A2C5E", // logo navy (primary)
+          dark: "#06203F",
+          bright: "#16498F",
+          glow: "#4E7BC0",
+        },
+        accent: {
+          DEFAULT: "#F4731C", // logo orange (accent / CTA)
+          dark: "#D8610F",
+          light: "#FF8A3D",
         },
         whatsapp: "#25D366",
         warning: "#F59E0B",
         danger: "#DC2626",
       },
       backgroundImage: {
-        // Signature gradient
-        "brand-gradient": "linear-gradient(135deg, #0A0F1F 0%, #0B5FFF 100%)",
-        "brand-gradient-deep": "linear-gradient(135deg, #000000 0%, #0A2540 100%)",
-        "brand-gradient-vivid": "linear-gradient(135deg, #0B5FFF 0%, #3B82F6 100%)",
+        // Navy gradient (signature) + a navy->orange variant for highlights
+        "brand-gradient": "linear-gradient(135deg, #0A2C5E 0%, #16498F 100%)",
+        "brand-gradient-deep": "linear-gradient(135deg, #06203F 0%, #0A2C5E 100%)",
+        "brand-gradient-vivid": "linear-gradient(135deg, #0A2C5E 0%, #F4731C 100%)",
       },
       fontFamily: {
         // Native system stack — no web-font download (low-bandwidth friendly).

@@ -9,9 +9,8 @@ export function Footer() {
         <div className="flex flex-col gap-6 sm:flex-row sm:justify-between">
           <div>
             <div className="flex items-center gap-2 text-white">
-              <span className="grid h-8 w-8 place-items-center rounded-lg bg-brand text-sm font-bold">
-                F
-              </span>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo.png" alt="Fundi" width={32} height={32} className="h-8 w-8 rounded-lg bg-white p-0.5" />
               <span className="text-lg font-bold">{SITE_NAME}</span>
             </div>
             <p className="mt-2 max-w-xs text-sm text-gray-400">{SITE_TAGLINE}</p>

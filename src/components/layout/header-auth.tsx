@@ -41,7 +41,7 @@ export function HeaderAuth() {
 
   // default (anonymous, or while resolving): show the primary CTA
   return (
-    <Link href="/rejoindre" className="btn-gradient ml-1 px-3 py-2 text-xs sm:text-sm">
+    <Link href="/rejoindre" className="btn-accent ml-1 px-3 py-2 text-xs sm:text-sm">
       Devenir fundi
     </Link>
   );

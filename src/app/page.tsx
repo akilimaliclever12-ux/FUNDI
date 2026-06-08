@@ -51,7 +51,7 @@ export default async function HomePage() {
               href={`/workers?profession=${p.slug}`}
               className="card flex items-center gap-3 p-4 transition hover:border-brand/40 hover:shadow"
             >
-              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-brand/10 text-brand">
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-accent/10 text-accent-dark">
                 ●
               </span>
               <span className="font-medium text-ink">{p.name_fr}</span>

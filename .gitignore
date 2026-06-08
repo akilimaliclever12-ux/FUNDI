@@ -28,3 +28,6 @@ yarn-error.log*
 # supabase
 supabase/.branches
 supabase/.temp
+
+# brand source assets (large originals)
+/brand/

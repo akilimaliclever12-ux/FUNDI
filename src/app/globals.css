@@ -4,7 +4,7 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #0a0f1f;
+  --foreground: #0a2240;
 }
 
 html {
@@ -18,6 +18,19 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+/* Subtle logo watermark behind every page (fixed, very low opacity, tiny file) */
+.page-watermark {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: url("/logo-watermark.png");
+  background-repeat: no-repeat;
+  background-position: center 38%;
+  background-size: min(70vw, 520px);
+  opacity: 0.04;
+}
+
 /* Reusable component classes (kept minimal; bandwidth-conscious) */
 @layer components {
   .container-page {
@@ -28,6 +41,9 @@ body {
   }
   .btn-primary {
     @apply btn bg-brand text-white hover:bg-brand-bright;
+  }
+  .btn-accent {
+    @apply btn bg-accent text-white shadow-sm hover:bg-accent-dark;
   }
   .btn-gradient {
     @apply btn bg-brand-gradient text-white shadow-sm hover:opacity-95;
