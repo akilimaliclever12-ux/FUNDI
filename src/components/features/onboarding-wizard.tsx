@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { PhotoUploader, type UploadedPhoto } from "./photo-uploader";
 import { createWorkerProfile } from "@/app/(worker)/rejoindre/actions";
+import { normalizeDrcPhone } from "@/lib/phone";
 import type { ProfessionRow } from "@/types/database.types";
 import type { CommuneNode } from "@/types";
 
@@ -31,11 +32,16 @@ export function OnboardingWizard({
 
   async function sendOtp(e: React.FormEvent) {
     e.preventDefault();
+    const normalized = normalizeDrcPhone(phone);
+    if (!normalized) {
+      return setError("Numéro invalide. Exemple : 097 000 0000");
+    }
+    setPhone(normalized);
     setBusy(true);
     setError(null);
-    const { error } = await supabase.auth.signInWithOtp({ phone });
+    const { error } = await supabase.auth.signInWithOtp({ phone: normalized });
     setBusy(false);
-    if (error) return setError("Envoi du code échoué. Vérifiez le numéro.");
+    if (error) return setError("Envoi du code échoué. Réessayez dans un instant.");
     setStep("otp");
   }
 
@@ -97,12 +103,16 @@ export function OnboardingWizard({
             <label className="label" htmlFor="phone">Votre numéro de téléphone</label>
             <input
               id="phone"
+              type="tel"
+              inputMode="tel"
+              autoComplete="tel"
               className="input"
-              placeholder="+243…"
+              placeholder="097 000 0000"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               required
             />
+            <p className="mt-1 text-xs text-gray-400">Numéro RDC. Un code vous sera envoyé par SMS.</p>
           </div>
           <button className="btn-gradient w-full" disabled={busy}>
             {busy ? "Envoi…" : "Recevoir le code"}
