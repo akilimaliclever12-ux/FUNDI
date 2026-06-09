@@ -94,11 +94,20 @@ export function NavMenu() {
     </>
   );
 
-  const guestCta = (
-    <Link href="/rejoindre" className="btn-accent px-3 py-2 text-xs sm:text-sm">
-      Devenir fundi
-    </Link>
+  const guestLinks = (
+    <>
+      <Link href="/connexion" className={linkCls}>
+        Connexion
+      </Link>
+      <Link href="/rejoindre" className="btn-accent px-3 py-2 text-xs sm:text-sm">
+        Devenir fundi
+      </Link>
+    </>
   );
+
+  // Render the auth-dependent section only once we know the state, to avoid
+  // briefly showing the wrong buttons (e.g. "Devenir fundi" to a logged-in user).
+  const authSection = signedIn === null ? null : signedIn ? authedLinks : guestLinks;
 
   return (
     <>
@@ -109,7 +118,7 @@ export function NavMenu() {
             {l.label}
           </Link>
         ))}
-        {signedIn ? authedLinks : guestCta}
+        {authSection}
       </nav>
 
       {/* Mobile: hamburger */}
@@ -136,7 +145,7 @@ export function NavMenu() {
               </Link>
             ))}
             <div className="my-1 border-t border-gray-100" />
-            {signedIn ? (
+            {signedIn === true && (
               <>
                 <Link href="/messages" className="flex items-center rounded-lg px-2 py-3 hover:bg-gray-50">
                   Messages <UnreadBadge />
@@ -145,15 +154,21 @@ export function NavMenu() {
                   Mon compte
                 </Link>
                 <div className="px-2 py-2">
-                  <LogoutButton className="w-full" />
+                  <LogoutButton className="w-full">Déconnexion</LogoutButton>
                 </div>
               </>
-            ) : (
-              <div className="px-2 py-2">
-                <Link href="/rejoindre" className="btn-accent w-full">
-                  Devenir fundi
+            )}
+            {signedIn === false && (
+              <>
+                <Link href="/connexion" className="rounded-lg px-2 py-3 hover:bg-gray-50">
+                  Connexion
                 </Link>
-              </div>
+                <div className="px-2 py-2">
+                  <Link href="/rejoindre" className="btn-accent w-full">
+                    Devenir fundi
+                  </Link>
+                </div>
+              </>
             )}
           </nav>
         </div>

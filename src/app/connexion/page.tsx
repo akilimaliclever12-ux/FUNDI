@@ -17,9 +17,9 @@ export default function ConnexionPage({
 
   return (
     <div className="container-page max-w-sm py-12">
-      <h1 className="text-xl font-bold text-ink">Connexion</h1>
+      <h1 className="text-xl font-bold text-ink">Connexion / Inscription</h1>
       <p className="mt-1 text-sm text-gray-500">
-        Connectez-vous par téléphone ou par email pour discuter avec les fundis.
+        Choisissez votre profil, puis connectez-vous par email ou téléphone.
       </p>
       <div className="mt-6">
         <AuthPanel next={next} />

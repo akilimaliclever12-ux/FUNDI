@@ -9,13 +9,13 @@ import { SMS_ENABLED } from "@/lib/config";
 import { cn } from "@/lib/utils";
 
 type Method = "phone" | "email";
-type Step = "auth" | "otp" | "name";
+type Step = "role" | "auth" | "otp" | "name";
 
 export function AuthPanel({ next = "/messages" }: { next?: string }) {
   const router = useRouter();
   const supabase = createClient();
   const [method, setMethod] = useState<Method>(SMS_ENABLED ? "phone" : "email");
-  const [step, setStep] = useState<Step>("auth");
+  const [step, setStep] = useState<Step>("role");
   const [emailMode, setEmailMode] = useState<"login" | "signup">("login");
 
   const [phone, setPhone] = useState("");
@@ -23,6 +23,7 @@ export function AuthPanel({ next = "/messages" }: { next?: string }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [agreed, setAgreed] = useState(false);
 
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -99,6 +100,7 @@ export function AuthPanel({ next = "/messages" }: { next?: string }) {
 
   async function saveName(e: React.FormEvent) {
     e.preventDefault();
+    if (!agreed) return setError("Vous devez accepter les Conditions Générales.");
     setBusy(true);
     setError(null);
     const res = await ensureCustomerProfile(name);
@@ -110,6 +112,32 @@ export function AuthPanel({ next = "/messages" }: { next?: string }) {
 
   return (
     <div className="card space-y-4 p-5">
+      {step === "role" && (
+        <div className="space-y-3">
+          <p className="text-sm font-medium text-ink">Vous êtes ?</p>
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              type="button"
+              onClick={() => setStep("auth")}
+              className="flex flex-col items-center gap-1 rounded-2xl border border-gray-200 p-4 text-center hover:border-brand/50 hover:bg-gray-50"
+            >
+              <span className="text-2xl">🙋</span>
+              <span className="font-semibold text-ink">Client</span>
+              <span className="text-xs text-gray-500">Je cherche un fundi</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => router.push("/rejoindre")}
+              className="flex flex-col items-center gap-1 rounded-2xl border border-gray-200 p-4 text-center hover:border-accent/50 hover:bg-gray-50"
+            >
+              <span className="text-2xl">🔧</span>
+              <span className="font-semibold text-ink">Fundi</span>
+              <span className="text-xs text-gray-500">Je propose mes services</span>
+            </button>
+          </div>
+        </div>
+      )}
+
       {step === "auth" && (
         <>
           {/* method tabs — phone only shown when SMS is configured */}
@@ -194,7 +222,22 @@ export function AuthPanel({ next = "/messages" }: { next?: string }) {
             <input id="name" className="input" value={name}
               onChange={(e) => setName(e.target.value)} required />
           </div>
-          <button className="btn-gradient w-full" disabled={busy}>
+          <label className="flex items-start gap-2 text-sm text-gray-600">
+            <input
+              type="checkbox"
+              checked={agreed}
+              onChange={(e) => setAgreed(e.target.checked)}
+              className="mt-0.5 h-4 w-4"
+            />
+            <span>
+              J&apos;accepte les{" "}
+              <a href="/conditions" target="_blank" rel="noopener noreferrer" className="text-brand underline">
+                Conditions Générales d&apos;Utilisation
+              </a>
+              .
+            </span>
+          </label>
+          <button className="btn-gradient w-full" disabled={busy || !agreed}>
             {busy ? "…" : "Continuer"}
           </button>
         </form>

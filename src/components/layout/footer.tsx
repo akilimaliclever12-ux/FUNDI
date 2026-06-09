@@ -22,6 +22,7 @@ export function Footer() {
             <Link href="/rejoindre" className="hover:text-white">Devenir fundi</Link>
             <Link href="/about" className="hover:text-white">À propos</Link>
             <Link href="/contact" className="hover:text-white">Contact</Link>
+            <Link href="/conditions" className="hover:text-white">Conditions</Link>
           </nav>
         </div>
 

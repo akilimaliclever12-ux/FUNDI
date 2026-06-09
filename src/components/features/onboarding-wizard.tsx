@@ -38,6 +38,7 @@ export function OnboardingWizard({
 
   const [communeId, setCommuneId] = useState("");
   const [photos, setPhotos] = useState<UploadedPhoto[]>([]);
+  const [agreed, setAgreed] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
@@ -102,6 +103,9 @@ export function OnboardingWizard({
     }
     if (photos.length < 1) {
       return setError("Ajoutez au moins une photo dans votre portfolio.");
+    }
+    if (!agreed) {
+      return setError("Vous devez accepter les Conditions Générales.");
     }
     setBusy(true);
     const profile = {
@@ -287,7 +291,22 @@ export function OnboardingWizard({
             <PhotoUploader value={photos} onChange={setPhotos} />
             <p className="mt-1 text-xs text-gray-400">Au moins 1 photo. Un portfolio attire plus de clients.</p>
           </div>
-          <button className="btn-gradient w-full" disabled={busy}>
+          <label className="flex items-start gap-2 text-sm text-gray-600">
+            <input
+              type="checkbox"
+              checked={agreed}
+              onChange={(e) => setAgreed(e.target.checked)}
+              className="mt-0.5 h-4 w-4"
+            />
+            <span>
+              J&apos;accepte les{" "}
+              <a href="/conditions" target="_blank" rel="noopener noreferrer" className="text-brand underline">
+                Conditions Générales d&apos;Utilisation
+              </a>
+              .
+            </span>
+          </label>
+          <button className="btn-gradient w-full" disabled={busy || !agreed}>
             {busy ? "Envoi…" : "Créer mon profil"}
           </button>
         </form>
