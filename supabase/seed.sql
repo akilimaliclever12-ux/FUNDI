@@ -9,7 +9,8 @@ insert into public.professions (slug, name_fr, name_sw, name_en, icon, sort_orde
   ('mason',       'Maçon',         'Fundi wa ujenzi',    'Mason',         'bricks',   4),
   ('welder',      'Soudeur',       'Fundi wa kuunganisha','Welder',       'flame',    5),
   ('painter',     'Peintre',       'Mpaka rangi',        'Painter',       'brush',    6),
-  ('construction','Professionnel du bâtiment', 'Fundi wa ujenzi mkuu', 'Construction professional', 'helmet', 7)
+  ('construction','Professionnel du bâtiment', 'Fundi wa ujenzi mkuu', 'Construction professional', 'helmet', 7),
+  ('staffeur', 'Staffeur', 'Fundi wa dari', 'Ceiling / plaster technician', 'panel-top', 8)
 on conflict (slug) do nothing;
 
 -- ---------- LOCATIONS ----------

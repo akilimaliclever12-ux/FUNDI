@@ -6,6 +6,7 @@ import {
   Flame,
   PaintRoller,
   HardHat,
+  PanelTop,
   Ruler,
   type LucideIcon,
 } from "lucide-react";
@@ -19,6 +20,7 @@ const ICONS: Record<string, LucideIcon> = {
   welder: Flame,
   painter: PaintRoller,
   construction: HardHat,
+  staffeur: PanelTop,
 };
 
 export function ProfessionIcon({

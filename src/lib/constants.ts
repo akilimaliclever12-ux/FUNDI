@@ -17,4 +17,5 @@ export const PROFESSION_LABELS: Record<string, string> = {
   welder: "Soudeur",
   painter: "Peintre",
   construction: "Professionnel du bâtiment",
+  staffeur: "Staffeur",
 };
