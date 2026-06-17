@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 };
 
 // Set the platform's own WhatsApp/contact number here.
-const SUPPORT_WHATSAPP = "+243000000000";
+const SUPPORT_WHATSAPP = "+14342578255";
 const SUPPORT_EMAIL = "contact@fundi.cd";
 
 export default function ContactPage() {
