@@ -87,8 +87,14 @@ export function AuthPanel({ next = "/messages" }: { next?: string }) {
         setBusy(false);
         return setError(error.message || "Création du compte échouée.");
       }
+      // Email already exists -> Supabase returns user with empty identities + no session.
+      if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+        setBusy(false);
+        setEmailMode("login");
+        return setError("Un compte existe déjà avec cet email. Connectez-vous.");
+      }
       if (!data.session) {
-        // email confirmation is required
+        // Only if email confirmation is ON in Supabase.
         setBusy(false);
         setInfo("Compte créé. Vérifiez votre email pour confirmer, puis connectez-vous.");
         setEmailMode("login");

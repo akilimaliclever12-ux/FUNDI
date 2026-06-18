@@ -83,7 +83,14 @@ export function OnboardingWizard({
       const { data, error } = await supabase.auth.signUp({ email, password });
       setBusy(false);
       if (error) return setError(error.message || "Création du compte échouée.");
+      // Supabase returns a "fake success" (user with empty identities, no
+      // session) when the email already exists — guide them to log in.
+      if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+        setEmailMode("login");
+        return setError("Un compte existe déjà avec cet email. Connectez-vous.");
+      }
       if (!data.session) {
+        // Only happens if email confirmation is ON in Supabase.
         setInfo("Compte créé. Vérifiez votre email pour confirmer, puis connectez-vous.");
         setEmailMode("login");
         return;
