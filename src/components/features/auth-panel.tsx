@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { getMyProfileState, ensureCustomerProfile } from "@/app/connexion/actions";
+import { getMyProfileState, ensureCustomerProfile, signUpConfirmed } from "@/app/connexion/actions";
 import { normalizeDrcPhone } from "@/lib/phone";
 import { SMS_ENABLED } from "@/lib/config";
 import { cn } from "@/lib/utils";
@@ -82,23 +82,18 @@ export function AuthPanel({ next = "/messages" }: { next?: string }) {
       }
       await afterAuth();
     } else {
-      const { data, error } = await supabase.auth.signUp({ email, password });
-      if (error) {
+      // Create an already-confirmed account server-side, then sign in.
+      const res = await signUpConfirmed(email, password);
+      if (!res.ok) {
         setBusy(false);
-        return setError(error.message || "Création du compte échouée.");
+        if (res.exists) setEmailMode("login");
+        return setError(res.error ?? "Création du compte échouée.");
       }
-      // Email already exists -> Supabase returns user with empty identities + no session.
-      if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+      const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
+      if (signInErr) {
         setBusy(false);
         setEmailMode("login");
-        return setError("Un compte existe déjà avec cet email. Connectez-vous.");
-      }
-      if (!data.session) {
-        // Only if email confirmation is ON in Supabase.
-        setBusy(false);
-        setInfo("Compte créé. Vérifiez votre email pour confirmer, puis connectez-vous.");
-        setEmailMode("login");
-        return;
+        return setError("Compte créé. Connectez-vous.");
       }
       await afterAuth();
     }

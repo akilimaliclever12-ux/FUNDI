@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { PhotoUploader, type UploadedPhoto } from "./photo-uploader";
 import { createWorkerProfile } from "@/app/(worker)/rejoindre/actions";
+import { signUpConfirmed } from "@/app/connexion/actions";
 import { normalizeDrcPhone } from "@/lib/phone";
 import { SMS_ENABLED } from "@/lib/config";
 import { cn } from "@/lib/utils";
@@ -80,20 +81,18 @@ export function OnboardingWizard({
       if (error) return setError("Email ou mot de passe incorrect.");
       setStep("profile");
     } else {
-      const { data, error } = await supabase.auth.signUp({ email, password });
-      setBusy(false);
-      if (error) return setError(error.message || "Création du compte échouée.");
-      // Supabase returns a "fake success" (user with empty identities, no
-      // session) when the email already exists — guide them to log in.
-      if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
-        setEmailMode("login");
-        return setError("Un compte existe déjà avec cet email. Connectez-vous.");
+      // Create an already-confirmed account server-side, then sign in.
+      const res = await signUpConfirmed(email, password);
+      if (!res.ok) {
+        setBusy(false);
+        if (res.exists) setEmailMode("login");
+        return setError(res.error ?? "Création du compte échouée.");
       }
-      if (!data.session) {
-        // Only happens if email confirmation is ON in Supabase.
-        setInfo("Compte créé. Vérifiez votre email pour confirmer, puis connectez-vous.");
+      const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
+      setBusy(false);
+      if (signInErr) {
         setEmailMode("login");
-        return;
+        return setError("Compte créé. Connectez-vous.");
       }
       setStep("profile");
     }

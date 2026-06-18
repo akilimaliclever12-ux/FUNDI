@@ -1,11 +1,57 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export interface EnsureResult {
   ok: boolean;
   error?: string;
   hasProfile?: boolean;
+}
+
+export interface SignUpResult {
+  ok: boolean;
+  error?: string;
+  exists?: boolean;
+}
+
+/**
+ * Create an account that is ALREADY email-confirmed (via the service role), so
+ * testers/users can sign in immediately regardless of Supabase's "Confirm
+ * email" setting. The client then calls signInWithPassword to get a session.
+ */
+export async function signUpConfirmed(
+  email: string,
+  password: string,
+): Promise<SignUpResult> {
+  const e = (email || "").trim().toLowerCase();
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)) {
+    return { ok: false, error: "Email invalide." };
+  }
+  if ((password || "").length < 6) {
+    return { ok: false, error: "Mot de passe trop court (6 caractères min)." };
+  }
+
+  const admin = createAdminClient();
+  const { error } = await admin.auth.admin.createUser({
+    email: e,
+    password,
+    email_confirm: true,
+  });
+
+  if (error) {
+    const msg = (error.message || "").toLowerCase();
+    if (
+      msg.includes("already") ||
+      msg.includes("registered") ||
+      msg.includes("exists") ||
+      error.status === 422
+    ) {
+      return { ok: false, exists: true, error: "Un compte existe déjà avec cet email." };
+    }
+    return { ok: false, error: "Création du compte échouée." };
+  }
+  return { ok: true };
 }
 
 /** Does the signed-in user already have a profile row? */
